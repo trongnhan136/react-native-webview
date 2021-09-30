@@ -12,11 +12,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
@@ -932,6 +934,41 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         dispatchEvent(this, event);
       }
     }
+
+
+    private boolean isViewpagerRoot(){
+      ViewParent parent = getParent();
+      if(parent != null){
+        parent = parent.getParent();
+        if(parent instanceof ViewPager){
+          return true;
+        }
+        if(parent != null){
+          parent = parent.getParent();
+          if(parent instanceof ViewPager){
+            return true;
+          }
+        }
+      }
+      return  false;
+    }
+
+    @Override
+    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+      if (isViewpagerRoot()) {
+        getParent().requestDisallowInterceptTouchEvent(false);
+      }
+      super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent p_event) {
+      if (p_event.getAction() == MotionEvent.ACTION_DOWN && isViewpagerRoot()) {
+        getParent().requestDisallowInterceptTouchEvent(true);
+      }
+      return super.onTouchEvent(p_event);
+    }
+
 
     protected void cleanupCallbacksAndDestroy() {
       setWebViewClient(null);

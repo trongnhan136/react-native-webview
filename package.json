@@ -1,5 +1,5 @@
 {
-  "name": "react-native-webview",
+  "name": "react-native-webview-unsupported",
   "description": "React Native WebView component for iOS, Android, and Windows 10 (coming soon)",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -8,8 +8,8 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "5.12.2",
-  "homepage": "https://github.com/react-native-community/react-native-webview#readme",
+  "version": "5.12.3",
+  "homepage": "https://github.com/trongnhan136/react-native-webview#readme",
   "scripts": {
     "ci": "CI=true && yarn lint && yarn test",
     "ci:publish": "yarn semantic-release",
@@ -54,7 +54,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-community/react-native-webview.git"
+    "url": "https://github.com/trongnhan136/react-native-webview.git"
   },
   "files": [
     "android",

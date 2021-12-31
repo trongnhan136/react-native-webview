@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.RequiresApi;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -799,6 +800,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected boolean sendContentSizeChangeEvents = false;
     private OnScrollDispatchHelper mOnScrollDispatchHelper;
     protected boolean hasScrollEvent = false;
+    protected boolean isZoomOut = false;
+    protected int defaultScale = 1;
 
     /**
      * WebView must be created with an context of the current activity
@@ -808,6 +811,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
      */
     public RNCWebView(ThemedReactContext reactContext) {
       super(reactContext);
+      setOnTouchListener(onTouch);
+      defaultScale = (int) getScale();
     }
 
     public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
@@ -962,6 +967,47 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       }
       super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
     }
+
+    private GestureDetectorCompat gestureDetector;
+
+    private View.OnTouchListener onTouch = new View.OnTouchListener() {
+
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+
+        if (gestureDetector == null) {
+          gestureDetector = new GestureDetectorCompat(getContext(), new GestureDetector.SimpleOnGestureListener() {
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                int scale = (int) getScale();
+                if (scale == defaultScale) {
+
+                  zoomBy(3.0F);
+                  isZoomOut = false;
+                } else {
+                  isZoomOut = true;
+                }
+              }
+              return super.onDoubleTap(e);
+            }
+
+            @Override
+            public boolean onDoubleTapEvent(MotionEvent e) {
+              if (isZoomOut) {
+                zoomOut();
+              }
+              return true;
+            }
+          });
+        }
+
+        gestureDetector.onTouchEvent(event);
+
+        return false;
+      }
+    };
 
     @Override
     public boolean onTouchEvent(MotionEvent p_event) {
